@@ -4,7 +4,7 @@ use base64::Engine;
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
 
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct PkceCode(String);
 
 impl PkceCode {
