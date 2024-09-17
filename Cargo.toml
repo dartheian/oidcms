@@ -4,3 +4,17 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+anyhow = "1.0.89"
+askama = "0.12.1"
+askama_axum = "0.4.0"
+axum = { version = "0.7.5", features = ["macros"] }
+axum-extra = { version = "0.9.3", features = ["typed-header"] }
+base64 = "0.22.1"
+headers = "0.4.0"
+http-serde = "2.1.1"
+jsonwebtoken = "9.3.0"
+rand = { version = "0.8.5", features = ["std_rng"] }
+serde = { version = "1.0.209", features = ["derive"] }
+serde_urlencoded = "0.7.1"
+sha2 = "0.10.8"
+tokio = { version = "1.39.3", features = ["rt-multi-thread"] }
