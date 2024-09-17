@@ -78,7 +78,10 @@ mod tests {
         fn bad_case() {
             let verifier_code = PkceCode("some_random_string".into());
             let challenge_code = PkceCode(CODE_CHALLENGE.into());
-            assert!(!verifier_code.verify(&challenge_code), "verification succeded, but should have failed",);
+            assert!(
+                !verifier_code.verify(&challenge_code),
+                "verification succeded, but should have failed",
+            );
         }
     }
 }
