@@ -1,7 +1,7 @@
 use base64::engine::general_purpose::URL_SAFE_NO_PAD;
 use base64::{DecodeError, Engine};
-use derive_more::derive::AsRef;
-use serde::{Deserialize, Serialize};
+use derive_more::derive::{AsRef, Display};
+use serde::{Deserialize, Deserializer, Serialize};
 use sha2::{Digest, Sha256};
 use thiserror::Error;
 
@@ -16,38 +16,42 @@ pub enum ParseError {
     NotBase64Urlencoded(#[from] DecodeError),
 }
 
+fn validate(value: &str) -> Result<(), ParseError> {
+    if value.len() < 40 {
+        return Err(ParseError::TooShort);
+    }
+    if 128 < value.len() {
+        return Err(ParseError::TooLong);
+    }
+    URL_SAFE_NO_PAD.decode(&value)?;
+    Ok(())
+}
+
 #[cfg_attr(test, derive(PartialEq))]
-#[derive(AsRef, Clone, Debug, Deserialize, Serialize)]
+#[derive(AsRef, Clone, Debug, Display, Serialize)]
 #[as_ref(forward)]
 #[serde(try_from = "String")]
 struct PkceCode(String);
 
-impl TryFrom<String> for PkceCode {
-    type Error = ParseError;
-
-    fn try_from(value: String) -> Result<Self, Self::Error> {
-        if value.len() < 40 {
-            return Err(ParseError::TooShort);
-        }
-        if 128 < value.len() {
-            return Err(ParseError::TooLong);
-        }
-        URL_SAFE_NO_PAD.decode(&value)?;
-        Ok(Self(value))
+impl<'de> Deserialize<'de> for PkceCode {
+    fn deserialize<D: Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        let string = String::deserialize(d)?;
+        validate(&string).map_err(serde::de::Error::custom)?;
+        Ok(Self(string))
     }
 }
 
-#[derive(AsRef, Clone, Debug, Deserialize, Serialize)]
+#[derive(AsRef, Clone, Debug, Deserialize, Display, Serialize)]
 #[as_ref(forward)]
 #[serde(transparent)]
 pub struct CodeChallenge(PkceCode);
 
-#[derive(AsRef, Deserialize)]
+#[derive(AsRef, Debug, Deserialize, Display)]
 #[as_ref(forward)]
 #[serde(transparent)]
 pub struct CodeVerifier(PkceCode);
 
-pub fn verify(challenge: CodeChallenge, verifier: CodeVerifier) -> bool {
+pub fn verify(challenge: &CodeChallenge, verifier: &CodeVerifier) -> bool {
     let hashed_verifier = Sha256::digest(verifier);
     let hashed_verifier = URL_SAFE_NO_PAD.encode(hashed_verifier);
     hashed_verifier == challenge.as_ref()
@@ -65,34 +69,31 @@ mod test {
 
         #[test]
         fn valid() {
-            assert_eq!(
-                Ok(PkceCode(CODE_CHALLENGE.to_string())),
-                PkceCode::try_from(CODE_CHALLENGE.to_string())
-            )
+            assert!(validate(CODE_CHALLENGE).is_ok())
         }
 
         #[test]
         fn too_short() {
             let string = "a".repeat(39);
-            assert_eq!(Err(ParseError::TooShort), PkceCode::try_from(string));
+            assert_eq!(Err(ParseError::TooShort), validate(&string));
         }
 
         #[test]
         fn too_long() {
             let string = "a".repeat(129);
-            assert_eq!(Err(ParseError::TooLong), PkceCode::try_from(string));
+            assert_eq!(Err(ParseError::TooLong), validate(&string));
         }
 
         #[test]
         fn long_enough() {
             let string = "a".repeat(40);
-            assert_eq!(Ok(PkceCode(string.clone())), PkceCode::try_from(string))
+            assert!(validate(&string).is_ok())
         }
 
         #[test]
         fn short_enough() {
             let string = "a".repeat(128);
-            assert_eq!(Ok(PkceCode(string.clone())), PkceCode::try_from(string))
+            assert!(validate(&string).is_ok())
         }
     }
 
@@ -103,14 +104,14 @@ mod test {
         fn valid() {
             let challenge = CodeChallenge(PkceCode(CODE_CHALLENGE.to_string()));
             let verifier = CodeVerifier(PkceCode(CODE_VERIFIER.to_string()));
-            assert_eq!(true, verify(challenge, verifier));
+            assert_eq!(true, verify(&challenge, &verifier));
         }
 
         #[test]
         fn invalid() {
             let challenge = CodeChallenge(PkceCode(CODE_CHALLENGE.to_string()));
             let verifier = CodeVerifier(PkceCode("a".repeat(43)));
-            assert_eq!(false, verify(challenge, verifier));
+            assert_eq!(false, verify(&challenge, &verifier));
         }
     }
 }

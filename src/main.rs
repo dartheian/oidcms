@@ -1,9 +1,11 @@
 mod extractor;
 mod handler;
-mod parameters;
+mod parameter;
 
+use axum::routing::post;
 use axum::{routing::get, Router};
 use handler::authorize::authorize;
+use handler::token::token;
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
 use tower_sessions::cookie::time::Duration;
@@ -16,9 +18,10 @@ async fn main() {
         .with_secure(false)
         .with_expiry(Expiry::OnInactivity(Duration::seconds(10)));
     let app = Router::new()
-        .route("/", get(authorize))
+        .route("/authorize", get(authorize))
+        .route("/token", post(token))
         .layer(session_layer);
-    let address = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let address = SocketAddr::from(([127, 0, 0, 1], 4000));
     let listener = TcpListener::bind(address).await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }
