@@ -7,12 +7,7 @@ struct UnixTime(u64);
 
 impl UnixTime {
     pub fn new() -> Self {
-        Self(
-            SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
-        )
+        Self(SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs())
     }
 }
 

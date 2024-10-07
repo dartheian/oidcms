@@ -35,5 +35,7 @@ of the Authentication and the Identity tokens are included in the responses.
 ## Usage
 
 ```bash
-cargo run
+$ cargo run
+$ ./script/authenticate.sh
+$ ./script/token.sh <code value from previous response>
 ```

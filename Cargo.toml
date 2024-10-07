@@ -9,15 +9,18 @@ askama_axum = "0.4.0"
 axum = { version = "0.7.7", features = ["macros"] }
 axum-extra = { version = "0.9.4", features = ["typed-header"] }
 base64 = "0.22.1"
-derive_more = { version = "1.0.0", features = ["as_ref", "display", "from"] }
+derive_more = { version = "1.0.0", features = [
+	"as_ref",
+	"display",
+	"from",
+	"from_str",
+] }
 headers = "0.4.0"
 http-serde = "2.1.1"
 jsonwebtoken = "9.3.0"
-quote = "1.0.37"
 rand = { version = "0.8.5", features = ["std_rng"] }
 serde = { version = "1.0.210", features = ["derive"] }
-serde_urlencoded = "0.7.1"
+serde_with = "3.11.0"
 sha2 = "0.10.8"
 thiserror = "1.0.64"
 tokio = { version = "1.40.0", features = ["rt-multi-thread"] }
-tower-sessions = { version = "0.13.0", features = ["memory-store"] }

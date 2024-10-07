@@ -18,38 +18,26 @@ pub struct TokenParams {
     pub redirect_uri: Uri,
 }
 
-fn code<'de, D>(deserializer: D) -> Result<Code, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    Code::deserialize(deserializer)
+fn code<'de, D: Deserializer<'de>>(d: D) -> Result<Code, D::Error> {
+    Code::deserialize(d)
         .map_err(|e| format!("error while parsing field `code`: {e}"))
         .map_err(serde::de::Error::custom)
 }
 
-fn code_verifier<'de, D>(deserializer: D) -> Result<CodeVerifier, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    CodeVerifier::deserialize(deserializer)
+fn code_verifier<'de, D: Deserializer<'de>>(d: D) -> Result<CodeVerifier, D::Error> {
+    CodeVerifier::deserialize(d)
         .map_err(|e| format!("error while parsing field `code_verifier`: {e}"))
         .map_err(serde::de::Error::custom)
 }
 
-fn grant_type<'de, D>(deserializer: D) -> Result<GrantType, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    GrantType::deserialize(deserializer)
+fn grant_type<'de, D: Deserializer<'de>>(d: D) -> Result<GrantType, D::Error> {
+    GrantType::deserialize(d)
         .map_err(|e| format!("error while parsing field `grant_type`: {e}"))
         .map_err(serde::de::Error::custom)
 }
 
-fn redirect_uri<'de, D>(deserializer: D) -> Result<Uri, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    http_serde::uri::deserialize(deserializer)
+fn redirect_uri<'de, D: Deserializer<'de>>(d: D) -> Result<Uri, D::Error> {
+    http_serde::uri::deserialize(d)
         .map_err(|e| format!("error while parsing field `redirect_uri`: {e}"))
         .map_err(serde::de::Error::custom)
 }

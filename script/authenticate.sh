@@ -1,4 +1,4 @@
-http localhost:3000 \
+http localhost:4000/authorize \
 client_id==0jrabyQWm4B9zVJPbotY \
 code_challenge_method==S256 \
 code_challenge==E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM \
