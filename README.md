@@ -10,24 +10,24 @@ of the Authentication and the Identity tokens are included in the responses.
 
 ## References
 
-[The OAuth 2.0 Authorization Framework](https://datatracker.ietf.org/doc/html/rfc6749)
-[OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html)
-[Proof Key for Code Exchange by OAuth Public Clients](https://datatracker.ietf.org/doc/html/rfc7636)
-[Form Post Response mode](https://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html)
-[OAuth 2.0 Threat Model and Security Considerations](https://datatracker.ietf.org/doc/html/rfc6819)
-[Json Web Token](https://datatracker.ietf.org/doc/html/rfc7519)
+- [The OAuth 2.0 Authorization Framework](https://datatracker.ietf.org/doc/html/rfc6749)
+- [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html)
+- [Proof Key for Code Exchange by OAuth Public Clients](https://datatracker.ietf.org/doc/html/rfc7636)
+- [Form Post Response mode](https://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html)
+- [OAuth 2.0 Threat Model and Security Considerations](https://datatracker.ietf.org/doc/html/rfc6819)
+- [Json Web Token](https://datatracker.ietf.org/doc/html/rfc7519)
 
-### Implementation differences from specifications
+### Implementation differences from RFC
 
 - The errors are unstructured human-readable strings, useful for debugging
   purposes
 
 ## Okta implementation
 
-[Authorization endpoint](https://developer.okta.com/docs/api/openapi/okta-oauth/oauth/tag/CustomAS/#tag/CustomAS/operation/authorizeCustomAS)
-[Token endpoint](https://developer.okta.com/docs/api/openapi/okta-oauth/oauth/tag/CustomAS/#tag/CustomAS/operation/tokenCustomAS)
+- [Authorization endpoint](https://developer.okta.com/docs/api/openapi/okta-oauth/oauth/tag/CustomAS/#tag/CustomAS/operation/authorizeCustomAS)
+- [Token endpoint](https://developer.okta.com/docs/api/openapi/okta-oauth/oauth/tag/CustomAS/#tag/CustomAS/operation/tokenCustomAS)
 
-### Okta differences from specifications
+### Okta differences from RFC
 
 - The required Identity token `aud` field is renamed to `client_id` (the purpose
   and content reamins unchanged)
