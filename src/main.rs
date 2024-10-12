@@ -11,6 +11,21 @@ use session::Session;
 use std::net::SocketAddr;
 use token::handler::token;
 use tokio::net::TcpListener;
+use tokio::signal::ctrl_c;
+use tokio::signal::unix::{signal, SignalKind};
+
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        ctrl_c().await.unwrap();
+    };
+    let terminate = async {
+        signal(SignalKind::terminate()).unwrap().recv().await;
+    };
+    tokio::select! {
+        _ = ctrl_c => {},
+        _ = terminate => {},
+    }
+}
 
 #[tokio::main]
 async fn main() {
@@ -21,5 +36,8 @@ async fn main() {
         .with_state(state);
     let address = SocketAddr::from(([127, 0, 0, 1], 4000));
     let listener = TcpListener::bind(address).await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+    axum::serve(listener, app)
+        .with_graceful_shutdown(shutdown_signal())
+        .await
+        .unwrap();
 }
