@@ -14,6 +14,8 @@ use tokio::net::TcpListener;
 use tokio::signal::ctrl_c;
 use tokio::signal::unix::{signal, SignalKind};
 
+const RNG_SEED: u64 = 0;
+
 async fn shutdown_signal() {
     let ctrl_c = async {
         ctrl_c().await.unwrap();
@@ -29,7 +31,7 @@ async fn shutdown_signal() {
 
 #[tokio::main]
 async fn main() {
-    let state = AppState::default();
+    let state = AppState::new(RNG_SEED);
     let app = Router::new()
         .route("/authorize", get(authorize))
         .route("/token", post(token))

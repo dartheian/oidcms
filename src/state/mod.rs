@@ -7,8 +7,6 @@ use rand::{Rng, SeedableRng};
 use std::collections::{HashMap, HashSet};
 use std::sync::{Arc, Mutex};
 
-const RNG_SEED: u64 = 0;
-
 pub struct AuthSession {
     pub client_id: ClientId,
     pub code_challenge: CodeChallenge,
@@ -21,19 +19,20 @@ pub struct State {
     rng: StdRng,
 }
 
-impl Default for State {
-    fn default() -> Self {
-        Self {
-            auth_session: Default::default(),
-            rng: StdRng::seed_from_u64(RNG_SEED),
-        }
-    }
-}
-
-#[derive(AsRef, Clone, Default, FromRequestParts)]
+#[derive(AsRef, Clone, FromRequestParts)]
 #[as_ref(forward)]
 #[from_request(via(axum::extract::State))]
 pub struct AppState(Arc<Mutex<State>>);
+
+impl AppState {
+    pub fn new(rng_seed: u64) -> Self {
+        let state = State {
+            auth_session: Default::default(),
+            rng: StdRng::seed_from_u64(rng_seed),
+        };
+        Self(Arc::new(Mutex::new(state)))
+    }
+}
 
 pub trait FromRng {
     fn from_rng<R: Rng>(rng: &mut R) -> Self;
