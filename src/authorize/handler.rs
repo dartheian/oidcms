@@ -1,10 +1,9 @@
 use super::extractor::AuthorizeParams;
+use crate::parameter::code::Code;
 use crate::parameter::State;
-use crate::session::{AuthSession, Session};
-use crate::{parameter::code::Code, session};
+use crate::state::{AppState, AuthSession};
 use askama::Template;
 use askama_axum::IntoResponse;
-use axum::extract::State as AxumState;
 use axum::http::{HeaderMap, Uri};
 use headers::{CacheControl, ContentType, HeaderMapExt, Pragma};
 
@@ -27,9 +26,9 @@ pub struct AuthorizeResponse {
     state: State,
 }
 
-pub async fn authorize(session: AxumState<Session>, params: AuthorizeParams) -> impl IntoResponse {
-    let code = Code::new();
-    session::set(&session, code.clone(), params.clone().into());
+pub async fn authorize(state: AppState, params: AuthorizeParams) -> impl IntoResponse {
+    let code: Code = state.random();
+    state.set(code.clone(), params.clone().into());
     let mut headers = HeaderMap::new();
     headers.typed_insert(ContentType::html());
     headers.typed_insert(CacheControl::new().with_no_cache().with_no_store());

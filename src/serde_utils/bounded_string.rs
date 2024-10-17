@@ -1,4 +1,6 @@
 use derive_more::derive::{AsRef, Display};
+use rand::distributions::{Alphanumeric, DistString};
+use rand::Rng;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -6,6 +8,16 @@ use thiserror::Error;
 #[as_ref(forward)]
 #[serde(try_from = "&str")]
 pub struct BoundedString<const L: usize, const U: usize>(String);
+
+impl<const L: usize, const U: usize> BoundedString<L, U> {
+    pub fn random<R: Rng>(rng: &mut R, length: usize) -> Self {
+        Alphanumeric
+            .sample_string(rng, length)
+            .as_str()
+            .try_into()
+            .unwrap()
+    }
+}
 
 #[derive(Debug, Error)]
 pub enum ParseError {

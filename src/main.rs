@@ -1,13 +1,13 @@
 mod authorize;
 mod parameter;
 mod serde_utils;
-mod session;
+mod state;
 mod token;
 
 use authorize::handler::authorize;
 use axum::routing::post;
 use axum::{routing::get, Router};
-use session::Session;
+use state::AppState;
 use std::net::SocketAddr;
 use token::handler::token;
 use tokio::net::TcpListener;
@@ -29,7 +29,7 @@ async fn shutdown_signal() {
 
 #[tokio::main]
 async fn main() {
-    let state = Session::default();
+    let state = AppState::default();
     let app = Router::new()
         .route("/authorize", get(authorize))
         .route("/token", post(token))

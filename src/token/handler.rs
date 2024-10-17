@@ -4,8 +4,7 @@ use crate::parameter::pkce::{CodeChallenge, CodeVerifier};
 use crate::parameter::subject::Subject;
 use crate::parameter::time::{Expiration, IssuedAt};
 use crate::parameter::{pkce, AccessToken, IdToken, Scope, TokenType};
-use crate::session::{self, AuthSession, Session};
-use axum::extract::State;
+use crate::state::{AppState, AuthSession};
 use axum::http::{StatusCode, Uri};
 use axum::response::{IntoResponse, Response, Result};
 use axum::Json;
@@ -48,14 +47,11 @@ impl IntoResponse for InvalidParamError {
     }
 }
 
-pub async fn token(
-    State(session): State<Session>,
-    params: TokenParams,
-) -> Result<impl IntoResponse> {
-    let auth_session = get_session(session, params.code)?;
+pub async fn token(state: AppState, params: TokenParams) -> Result<impl IntoResponse> {
+    let auth_session = get_session(&state, params.code)?;
     verify_pkce(auth_session.code_challenge, params.code_verifier)?;
     verify_redirect_uri(auth_session.redirect_uri, params.redirect_uri)?;
-    let subject = Subject::new();
+    let subject: Subject = state.random();
     let access_token = AccessToken {
         aud: auth_session.client_id.clone(),
         exp: Expiration::new(),
@@ -79,8 +75,8 @@ pub async fn token(
     }))
 }
 
-fn get_session(session: Session, code: Code) -> Result<AuthSession, InvalidParamError> {
-    session::get(session, &code).ok_or(InvalidParamError::Code(code))
+fn get_session(state: &AppState, code: Code) -> Result<AuthSession, InvalidParamError> {
+    state.get(&code).ok_or(InvalidParamError::Code(code))
 }
 
 fn verify_pkce(challenge: CodeChallenge, verifier: CodeVerifier) -> Result<(), InvalidParamError> {
