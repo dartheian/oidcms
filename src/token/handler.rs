@@ -54,14 +54,14 @@ pub async fn token(state: AppState, params: TokenParams) -> Result<impl IntoResp
     let subject: Subject = state.random();
     let access_token = AccessToken {
         aud: auth_session.client_id.clone(),
-        exp: Expiration::new(),
+        exp: Expiration::new(60),
         iat: IssuedAt::new(),
         iss: Uri::try_from(ISSUER).unwrap(),
         sub: subject.clone(),
     };
     let id_token = IdToken {
         client_id: auth_session.client_id,
-        exp: Expiration::new(),
+        exp: Expiration::new(60),
         iat: IssuedAt::new(),
         iss: Uri::try_from(ISSUER).unwrap(),
         sub: subject,
