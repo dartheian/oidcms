@@ -44,7 +44,6 @@ $ ./script/token.sh <code value from previous response>
 
 - Dockerfile
 - Doument httpie usage in scripts
-- Healt-ckeck endpoint
 - Implement error responses as per RFCs
 - Logs
 - Make things configurable

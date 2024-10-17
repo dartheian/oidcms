@@ -5,6 +5,7 @@ mod state;
 mod token;
 
 use authorize::handler::authorize;
+use axum::http::StatusCode;
 use axum::routing::post;
 use axum::{routing::get, Router};
 use state::AppState;
@@ -33,6 +34,7 @@ async fn shutdown_signal() {
 async fn main() {
     let state = AppState::new(RNG_SEED);
     let app = Router::new()
+        .route("/health", get(|| async { StatusCode::OK }))
         .route("/authorize", get(authorize))
         .route("/token", post(token))
         .with_state(state);
