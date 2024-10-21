@@ -1,6 +1,7 @@
 mod authorize;
+mod bounded_string;
+mod config;
 mod parameter;
-mod serde_utils;
 mod state;
 mod token;
 
@@ -8,14 +9,13 @@ use authorize::handler::authorize;
 use axum::http::StatusCode;
 use axum::routing::post;
 use axum::{routing::get, Router};
+use config::Configuration;
 use state::AppState;
 use std::net::SocketAddr;
 use token::handler::token;
 use tokio::net::TcpListener;
 use tokio::signal::ctrl_c;
 use tokio::signal::unix::{signal, SignalKind};
-
-const RNG_SEED: u64 = 0;
 
 async fn shutdown_signal() {
     let ctrl_c = async {
@@ -32,13 +32,14 @@ async fn shutdown_signal() {
 
 #[tokio::main]
 async fn main() {
-    let state = AppState::new(RNG_SEED);
+    let config = Configuration::new();
+    let address: SocketAddr = (config.host, config.port).into();
+    let state = AppState::from(config);
     let app = Router::new()
         .route("/health", get(|| async { StatusCode::OK }))
         .route("/authorize", get(authorize))
         .route("/token", post(token))
         .with_state(state);
-    let address = SocketAddr::from(([127, 0, 0, 1], 4000));
     let listener = TcpListener::bind(address).await.unwrap();
     axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())

@@ -1,4 +1,4 @@
-use crate::serde_utils::bounded_string::{BoundedString, UpperBoundedString};
+use crate::bounded_string::{BoundedString, UpperBoundedString};
 use crate::state::FromRng;
 use rand::Rng;
 use serde::Serialize;

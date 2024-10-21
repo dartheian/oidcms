@@ -27,8 +27,8 @@ pub struct AuthorizeResponse {
 }
 
 pub async fn authorize(state: AppState, params: AuthorizeParams) -> impl IntoResponse {
-    let code: Code = state.random();
-    state.set(code.clone(), params.clone().into());
+    let code: Code = state.gen_random();
+    state.set_session(code.clone(), params.clone().into());
     let mut headers = HeaderMap::new();
     headers.typed_insert(ContentType::html());
     headers.typed_insert(CacheControl::new().with_no_cache().with_no_store());

@@ -46,4 +46,3 @@ $ ./script/token.sh <code value from previous response>
 - Doument httpie usage in scripts
 - Implement error responses as per RFCs
 - Logs
-- Make things configurable

@@ -1,4 +1,4 @@
-use crate::serde_utils::bounded_string::{self, BoundedString};
+use crate::bounded_string::{self, BoundedString};
 use base64::engine::general_purpose::URL_SAFE_NO_PAD;
 use base64::{DecodeError, Engine};
 use derive_more::derive::{AsRef, Display};

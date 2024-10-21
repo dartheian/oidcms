@@ -1,4 +1,4 @@
-use crate::serde_utils::bounded_string::{BoundedString, LowerBoundedString};
+use crate::bounded_string::{BoundedString, LowerBoundedString};
 use crate::state::FromRng;
 use derive_more::derive::{AsRef, Display};
 use rand::Rng;
