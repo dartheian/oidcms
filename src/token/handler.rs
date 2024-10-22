@@ -1,11 +1,11 @@
 use super::extractor::TokenParams;
+use super::jwt;
 use crate::parameter::code::Code;
 use crate::parameter::pkce::{CodeChallenge, CodeVerifier};
 use crate::parameter::subject::Subject;
 use crate::parameter::time::{Expiration, IssuedAt};
 use crate::parameter::{pkce, AccessToken, IdToken, Scope, TokenType};
-use crate::session::{self, AuthSession, Session};
-use axum::extract::State;
+use crate::state::{AppState, AuthSession};
 use axum::http::{StatusCode, Uri};
 use axum::response::{IntoResponse, Response, Result};
 use axum::Json;
@@ -13,16 +13,11 @@ use serde::Serialize;
 use std::collections::HashSet;
 use thiserror::Error;
 
-const EXPIRES_IN: u64 = 3600;
-const ISSUER: &str = "http://rain.okta1.com:1802";
-
 #[derive(Serialize)]
 pub struct TokenResponse {
-    #[serde(serialize_with = "crate::serde_utils::jwt::serialize")]
-    access_token: AccessToken,
+    access_token: String,
     expires_in: u64,
-    #[serde(serialize_with = "crate::serde_utils::jwt::serialize")]
-    id_token: IdToken,
+    id_token: String,
     scope: HashSet<Scope>,
     token_type: TokenType,
 }
@@ -35,6 +30,8 @@ pub enum InvalidParamError {
     Grant(CodeChallenge, CodeVerifier),
     #[error("`redirect_uri` does not match: expected `{expected}` got `{got}`")]
     RedirectUri { expected: Uri, got: Uri },
+    #[error("jwt encode error: `{0}`")]
+    Jwt(#[from] jsonwebtoken::errors::Error),
 }
 
 impl IntoResponse for InvalidParamError {
@@ -48,39 +45,38 @@ impl IntoResponse for InvalidParamError {
     }
 }
 
-pub async fn token(
-    State(session): State<Session>,
-    params: TokenParams,
-) -> Result<impl IntoResponse> {
-    let auth_session = get_session(session, params.code)?;
+pub async fn token(state: AppState, params: TokenParams) -> Result<impl IntoResponse> {
+    let auth_session = get_session(&state, params.code)?;
     verify_pkce(auth_session.code_challenge, params.code_verifier)?;
     verify_redirect_uri(auth_session.redirect_uri, params.redirect_uri)?;
-    let subject = Subject::new();
+    let subject: Subject = state.gen_random();
     let access_token = AccessToken {
         aud: auth_session.client_id.clone(),
-        exp: Expiration::new(),
+        exp: Expiration::new(state.expiration()),
         iat: IssuedAt::new(),
-        iss: Uri::try_from(ISSUER).unwrap(),
+        iss: state.issuer(),
         sub: subject.clone(),
     };
     let id_token = IdToken {
         client_id: auth_session.client_id,
-        exp: Expiration::new(),
+        exp: Expiration::new(state.expiration()),
         iat: IssuedAt::new(),
-        iss: Uri::try_from(ISSUER).unwrap(),
+        iss: state.issuer(),
         sub: subject,
     };
     Ok(Json(TokenResponse {
-        access_token,
-        expires_in: EXPIRES_IN,
-        id_token,
+        access_token: jwt::encode(access_token, state.secret()).unwrap(),
+        expires_in: state.expiration(),
+        id_token: jwt::encode(id_token, state.secret()).unwrap(),
         scope: auth_session.scope,
         token_type: TokenType::Bearer,
     }))
 }
 
-fn get_session(session: Session, code: Code) -> Result<AuthSession, InvalidParamError> {
-    session::get(session, &code).ok_or(InvalidParamError::Code(code))
+fn get_session(state: &AppState, code: Code) -> Result<AuthSession, InvalidParamError> {
+    state
+        .get_session(&code)
+        .ok_or(InvalidParamError::Code(code))
 }
 
 fn verify_pkce(challenge: CodeChallenge, verifier: CodeVerifier) -> Result<(), InvalidParamError> {

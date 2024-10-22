@@ -1,5 +1,5 @@
 [package]
-name = "oidc-mock"
+name = "oidcms"
 version = "0.1.0"
 edition = "2021"
 
@@ -9,6 +9,7 @@ askama_axum = "0.4.0"
 axum = { version = "0.7.7", features = ["macros"] }
 axum-extra = { version = "0.9.4", features = ["typed-header"] }
 base64 = "0.22.1"
+config = "0.14.0"
 derive_more = { version = "1.0.0", features = [
 	"as_ref",
 	"display",
@@ -20,7 +21,7 @@ http-serde = "2.1.1"
 jsonwebtoken = "9.3.0"
 rand = { version = "0.8.5", features = ["std_rng"] }
 serde = { version = "1.0.210", features = ["derive"] }
-serde_with = "3.11.0"
+serde_with = { version = "3.11.0", features = ["base64"] }
 sha2 = "0.10.8"
 thiserror = "1.0.64"
-tokio = { version = "1.40.0", features = ["rt-multi-thread"] }
+tokio = { version = "1.40.0", features = ["signal", "rt-multi-thread"] }

@@ -24,8 +24,8 @@ Authentication and the Identity tokens are included in the responses.
 
 ## Okta implementation
 
-- [Authorization endpoint](https://developer.okta.com/docs/api/openapi/okta-oauth/oauth/tag/CustomAS/#tag/CustomAS/operation/authorizeCustomAS)
-- [Token endpoint](https://developer.okta.com/docs/api/openapi/okta-oauth/oauth/tag/CustomAS/#tag/CustomAS/operation/tokenCustomAS)
+- [Authorization endpoint](https://developer.okta.com/docs/api/openapi/okta-oauth/oauth/tag/OrgAS/#tag/OrgAS/operation/authorize)
+- [Token endpoint](https://developer.okta.com/docs/api/openapi/okta-oauth/oauth/tag/OrgAS/#tag/OrgAS/operation/token)
 
 ### Okta differences from RFC
 
@@ -44,7 +44,5 @@ $ ./script/token.sh <code value from previous response>
 
 - Dockerfile
 - Doument httpie usage in scripts
-- Healt-ckeck endpoint
 - Implement error responses as per RFCs
 - Logs
-- Make things configurable

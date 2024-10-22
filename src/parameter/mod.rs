@@ -3,7 +3,7 @@ pub mod pkce;
 pub mod subject;
 pub mod time;
 
-use crate::serde_utils::bounded_string::{LowerBoundedString, NonEmptyString};
+use crate::bounded_string::{LowerBoundedString, NonEmptyString};
 use axum::http::Uri;
 use derive_more::derive::{Display, FromStr};
 use serde::{Deserialize, Serialize};
