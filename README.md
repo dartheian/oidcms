@@ -21,6 +21,7 @@ Authentication and the Identity tokens are included in the responses.
 
 - The errors are unstructured human-readable strings, useful for debugging
   purposes
+- Use of a custom `groups` scope
 
 ## Okta implementation
 
