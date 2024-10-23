@@ -44,6 +44,7 @@ pub enum TokenType {
 pub enum Scope {
     Address,
     Email,
+    Groups,
     Openid,
     Phone,
     Profile,
