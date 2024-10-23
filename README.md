@@ -43,6 +43,6 @@ $ ./script/token.sh <code value from previous response>
 ## TODO
 
 - Dockerfile
-- Doument httpie usage in scripts
+- Document httpie usage in scripts
 - Implement error responses as per RFCs
 - Logs
