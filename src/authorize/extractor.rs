@@ -70,7 +70,7 @@ fn response_type<'de, D: Deserializer<'de>>(d: D) -> Result<ResponseType, D::Err
 fn scope<'de, D: Deserializer<'de>>(d: D) -> Result<HashSet<Scope>, D::Error> {
     StringWithSeparator::<SpaceSeparator, Scope>::deserialize_as(d)
         .and_then(|s| validate_scope(s).map_err(serde::de::Error::custom))
-        .map_err(|e| format!("error while parsing field `state`: {e}"))
+        .map_err(|e| format!("error while parsing field `scope`: {e}"))
         .map_err(serde::de::Error::custom)
 }
 
