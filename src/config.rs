@@ -1,13 +1,10 @@
-use std::net::Ipv4Addr;
-
+use crate::data::Secret;
 use axum::http::Uri;
 use config::{Config, Environment};
 use serde::Deserialize;
-use serde_with::base64::{Base64, Standard};
-use serde_with::formats::Padded;
-use serde_with::serde_as;
+use std::net::Ipv4Addr;
+use std::path::PathBuf;
 
-#[serde_as]
 #[derive(Deserialize)]
 pub struct Configuration {
     pub expiration: u64,
@@ -16,8 +13,8 @@ pub struct Configuration {
     pub issuer: Uri,
     pub port: u16,
     pub rng_seed: u64,
-    #[serde_as(as = "Base64<Standard, Padded>")]
-    pub secret: Vec<u8>,
+    pub secret: Secret,
+    pub user_file: PathBuf,
 }
 
 impl Configuration {

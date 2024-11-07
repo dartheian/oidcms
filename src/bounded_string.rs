@@ -1,6 +1,5 @@
+use crate::crypto::SECURE_LENGTH;
 use derive_more::derive::{AsRef, Display};
-use rand::distributions::{Alphanumeric, DistString};
-use rand::Rng;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -8,16 +7,6 @@ use thiserror::Error;
 #[as_ref(forward)]
 #[serde(try_from = "&str")]
 pub struct BoundedString<const L: usize, const U: usize>(String);
-
-impl<const L: usize, const U: usize> BoundedString<L, U> {
-    pub fn random<R: Rng>(rng: &mut R, length: usize) -> Self {
-        Alphanumeric
-            .sample_string(rng, length)
-            .as_str()
-            .try_into()
-            .unwrap()
-    }
-}
 
 #[derive(Debug, Error)]
 pub enum ParseError {
@@ -46,9 +35,8 @@ impl<const L: usize, const U: usize> TryFrom<&str> for BoundedString<L, U> {
     }
 }
 
-pub type LowerBoundedString<const L: usize> = BoundedString<L, { usize::MAX }>;
-pub type UpperBoundedString<const U: usize> = BoundedString<1, U>;
 pub type NonEmptyString = BoundedString<1, { usize::MAX }>;
+pub type SecureString = BoundedString<SECURE_LENGTH, { usize::MAX }>;
 
 #[cfg(test)]
 mod test {

@@ -1,0 +1,21 @@
+{
+	"address": {
+		"street_address": "123 Hollywood Blvd.",
+		"locality": "Los Angeles",
+		"region": "CA",
+		"postal_code": "90210",
+		"country": "US"
+	},
+	"email_verified": true,
+	"email": "john.doe@example.com",
+	"family_name": "Doe",
+	"given_name": "John",
+	"locale": "en-US",
+	"middle_name": "James",
+	"name": "John Doe",
+	"nickname": "Jimmy",
+	"phone_number": "+1 (425) 555-1212",
+	"profile": "https://example.com/john.doe",
+	"updated_at": 1311280970,
+	"zoneinfo": "America/Los_Angeles"
+}

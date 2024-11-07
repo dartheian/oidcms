@@ -1,5 +1,6 @@
 .github
 .gitignore
+compose.yml
 README.md
 script
 target
