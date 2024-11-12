@@ -56,6 +56,7 @@ pub enum Scope {
 }
 
 #[derive(Display, Serialize)]
+#[allow(unused)]
 pub enum AuthenticationMethod {
     #[display("Password authentication")]
     Pwd,

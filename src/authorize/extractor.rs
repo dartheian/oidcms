@@ -13,6 +13,7 @@ use thiserror::Error;
 #[serde_as]
 #[derive(Clone, Deserialize, FromRequestParts)]
 #[from_request(via(Query))]
+#[allow(unused)]
 pub struct AuthorizeParams {
     #[serde(deserialize_with = "client_id")]
     pub client_id: SecureString,

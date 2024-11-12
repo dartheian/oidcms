@@ -7,6 +7,7 @@ use serde::{Deserialize, Deserializer};
 
 #[derive(Deserialize, FromRequest)]
 #[from_request(via(Form))]
+#[allow(unused)]
 pub struct TokenParams {
     #[serde(deserialize_with = "code_verifier")]
     pub code_verifier: CodeVerifier,
