@@ -43,7 +43,6 @@ cargo run
 
 ## TODO
 
-- Dockerfile
 - Document httpie usage in scripts
 - Implement error responses as per RFCs
 - Logs
