@@ -6,7 +6,6 @@ use crate::data::pkce::{CodeChallenge, CodeVerifier};
 use crate::data::time::UnixTime;
 use crate::data::{pkce, AuthenticationMethod, IdToken, Scope, TokenType};
 use crate::state::{AppState, AuthSession};
-use axum::extract::ConnectInfo;
 use axum::http::{StatusCode, Uri};
 use axum::response::{IntoResponse, Response, Result};
 use axum::Json;
@@ -28,12 +27,14 @@ pub struct TokenResponse {
 
 #[derive(Debug, Error)]
 pub enum InvalidParamError {
+    #[error("`client_secret` does not match: expected `{0}` got `{0}`")]
+    ClientSecret(SecureString, SecureString),
     #[error("no auth session associated with code `{0}`")]
     Code(SecureString),
     #[error("pkce verification failed: expected `{0}` got `{1}`")]
     Grant(CodeChallenge, CodeVerifier),
-    #[error("`redirect_uri` does not match: expected `{expected}` got `{got}`")]
-    RedirectUri { expected: Uri, got: Uri },
+    #[error("`redirect_uri` does not match: expected `{0}` got `{1}`")]
+    RedirectUri(Uri, Uri),
     #[error("jwt encode error: `{0}`")]
     Jwt(#[from] jsonwebtoken::errors::Error),
 }
@@ -49,17 +50,14 @@ impl IntoResponse for InvalidParamError {
     }
 }
 
-pub async fn token(
-    state: AppState,
-    ConnectInfo(client_url): ConnectInfo<Uri>,
-    params: TokenParams,
-) -> Result<impl IntoResponse> {
+pub async fn token(state: AppState, params: TokenParams) -> Result<impl IntoResponse> {
     let auth_session = get_session(&state, params.code)?;
     verify_pkce(auth_session.code_challenge, params.code_verifier)?;
     verify_redirect_uri(auth_session.redirect_uri, params.redirect_uri)?;
+    verify_client_secret(params.client_secret, state.client_secret())?;
     let now = UnixTime::now();
     let access_token = AccessToken {
-        aud: client_url,
+        aud: state.audience(),
         auth_time: now,
         cid: auth_session.client_id.clone(),
         exp: now + state.expiration(),
@@ -111,7 +109,18 @@ fn verify_redirect_uri(expected: Uri, got: Uri) -> Result<(), InvalidParamError>
     if expected == got {
         Ok(())
     } else {
-        Err(InvalidParamError::RedirectUri { expected, got })
+        Err(InvalidParamError::RedirectUri(expected, got))
+    }
+}
+
+fn verify_client_secret(
+    expected: SecureString,
+    got: SecureString,
+) -> Result<(), InvalidParamError> {
+    if expected == got {
+        Ok(())
+    } else {
+        Err(InvalidParamError::ClientSecret(expected, got))
     }
 }
 

@@ -10,7 +10,6 @@ use rand::rngs::StdRng;
 use rand::SeedableRng;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
-use std::fs::File;
 use std::sync::{Arc, RwLock};
 
 #[derive(Clone, Deserialize, Serialize)]
@@ -47,6 +46,8 @@ pub struct AuthSession {
 }
 
 pub struct Vars {
+    pub audience: Uri,
+    pub client_secret: SecureString,
     pub expiration: u64,
     pub issuer: Uri,
     pub secret: Secret,
@@ -56,6 +57,8 @@ pub struct Vars {
 impl From<Configuration> for Vars {
     fn from(config: Configuration) -> Self {
         Self {
+            audience: config.audience,
+            client_secret: config.client_secret,
             expiration: config.expiration,
             issuer: config.issuer,
             secret: config.secret,
@@ -95,10 +98,15 @@ impl AppState {
 
     pub fn gen_secure_string(&self) -> SecureString {
         let mut lock = self.as_ref().write().unwrap();
-        strong_random_bytes(&mut lock.rng)
-            .as_str()
-            .try_into()
-            .unwrap()
+        strong_random_bytes(&mut lock.rng).try_into().unwrap()
+    }
+
+    pub fn audience(&self) -> Uri {
+        self.0.read().unwrap().vars.audience.clone()
+    }
+
+    pub fn client_secret(&self) -> SecureString {
+        self.0.read().unwrap().vars.client_secret.clone()
     }
 
     pub fn expiration(&self) -> u64 {
@@ -120,12 +128,10 @@ impl AppState {
 
 impl From<Configuration> for AppState {
     fn from(configuration: Configuration) -> Self {
-        let user_file_path = configuration.user_file.clone();
-        let user_file = File::open(user_file_path).unwrap();
         let state = State {
             auth_sessions: Default::default(),
             rng: StdRng::seed_from_u64(configuration.rng_seed),
-            user: serde_json::from_reader(user_file).unwrap(),
+            user: configuration.user.clone(),
             vars: configuration.into(),
         };
         Self(Arc::new(RwLock::new(state)))

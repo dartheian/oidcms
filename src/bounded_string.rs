@@ -5,7 +5,7 @@ use thiserror::Error;
 
 #[derive(AsRef, Clone, Debug, Deserialize, Display, Eq, Hash, PartialEq, Serialize)]
 #[as_ref(forward)]
-#[serde(try_from = "&str")]
+#[serde(try_from = "String")]
 pub struct BoundedString<const L: usize, const U: usize>(String);
 
 #[derive(Debug, Error)]
@@ -32,6 +32,15 @@ impl<const L: usize, const U: usize> TryFrom<&str> for BoundedString<L, U> {
             return Err(ParseError::TooLong(U, value.into()));
         }
         Ok(Self(value.into()))
+    }
+}
+
+impl<const L: usize, const U: usize> TryFrom<String> for BoundedString<L, U> {
+    type Error = ParseError;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        let s: &str = value.as_ref();
+        s.try_into()
     }
 }
 

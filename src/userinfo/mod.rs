@@ -38,8 +38,9 @@ pub async fn userinfo(
 }
 
 fn decode_access_token(state: &AppState, bearer: Bearer) -> Result<AccessToken, Error> {
-    let key = DecodingKey::from_secret(&state.secret().as_ref());
-    let validation = Validation::default();
-    let a = decode(bearer.token(), &key, &validation)?;
-    Ok(a.claims)
+    let mut validation = Validation::default();
+    validation.set_audience(&[state.audience()]);
+    let key = DecodingKey::from_secret(state.secret().as_ref());
+    let token = decode(bearer.token(), &key, &validation)?;
+    Ok(token.claims)
 }

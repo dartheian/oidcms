@@ -9,6 +9,10 @@ use serde::{Deserialize, Deserializer};
 #[from_request(via(Form))]
 #[allow(unused)]
 pub struct TokenParams {
+    #[serde(deserialize_with = "client_id")]
+    pub client_id: SecureString,
+    #[serde(deserialize_with = "client_secret")]
+    pub client_secret: SecureString,
     #[serde(deserialize_with = "code_verifier")]
     pub code_verifier: CodeVerifier,
     #[serde(deserialize_with = "code")]
@@ -17,6 +21,18 @@ pub struct TokenParams {
     pub grant_type: GrantType,
     #[serde(deserialize_with = "redirect_uri")]
     pub redirect_uri: Uri,
+}
+
+fn client_id<'de, D: Deserializer<'de>>(d: D) -> Result<SecureString, D::Error> {
+    Deserialize::deserialize(d)
+        .map_err(|e| format!("error while parsing field `client_id`: {e}"))
+        .map_err(serde::de::Error::custom)
+}
+
+fn client_secret<'de, D: Deserializer<'de>>(d: D) -> Result<SecureString, D::Error> {
+    Deserialize::deserialize(d)
+        .map_err(|e| format!("error while parsing field `client_secret`: {e}"))
+        .map_err(serde::de::Error::custom)
 }
 
 fn code<'de, D: Deserializer<'de>>(d: D) -> Result<SecureString, D::Error> {
