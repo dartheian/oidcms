@@ -6,7 +6,6 @@ RUN cargo install --path . --root /usr
 
 FROM gcr.io/distroless/cc-debian12
 COPY --from=build-env /usr/bin/oidcms /
-HEALTHCHECK --interval=5s --timeout=2s --start-period=3s --start-interval=1s CMD curl -f http://${HOST}:${PORT}/health || exit 1
 CMD ["./oidcms"]
 
 ENV AUDIENCE="api.example.com"
