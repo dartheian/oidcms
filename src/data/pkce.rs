@@ -28,6 +28,14 @@ impl TryFrom<&str> for PkceCode {
     }
 }
 
+impl TryFrom<String> for PkceCode {
+    type Error = ParseError;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        Self::try_from(value.as_ref())
+    }
+}
+
 #[derive(AsRef, Clone, Debug, Deserialize, Display)]
 #[as_ref(forward)]
 #[serde(transparent)]
