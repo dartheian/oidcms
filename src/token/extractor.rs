@@ -1,37 +1,54 @@
-use crate::parameter::code::Code;
-use crate::parameter::pkce::CodeVerifier;
-use crate::parameter::GrantType;
+use crate::bounded_string::SecureString;
+use crate::data::pkce::CodeVerifier;
+use crate::data::GrantType;
 use axum::extract::{Form, FromRequest};
 use axum::http::Uri;
 use serde::{Deserialize, Deserializer};
 
 #[derive(Deserialize, FromRequest)]
 #[from_request(via(Form))]
+#[allow(unused)]
 pub struct TokenParams {
+    #[serde(deserialize_with = "client_id")]
+    pub client_id: SecureString,
+    #[serde(deserialize_with = "client_secret")]
+    pub client_secret: SecureString,
     #[serde(deserialize_with = "code_verifier")]
     pub code_verifier: CodeVerifier,
     #[serde(deserialize_with = "code")]
-    pub code: Code,
+    pub code: SecureString,
     #[serde(deserialize_with = "grant_type")]
     pub grant_type: GrantType,
     #[serde(deserialize_with = "redirect_uri")]
     pub redirect_uri: Uri,
 }
 
-fn code<'de, D: Deserializer<'de>>(d: D) -> Result<Code, D::Error> {
-    Code::deserialize(d)
+fn client_id<'de, D: Deserializer<'de>>(d: D) -> Result<SecureString, D::Error> {
+    Deserialize::deserialize(d)
+        .map_err(|e| format!("error while parsing field `client_id`: {e}"))
+        .map_err(serde::de::Error::custom)
+}
+
+fn client_secret<'de, D: Deserializer<'de>>(d: D) -> Result<SecureString, D::Error> {
+    Deserialize::deserialize(d)
+        .map_err(|e| format!("error while parsing field `client_secret`: {e}"))
+        .map_err(serde::de::Error::custom)
+}
+
+fn code<'de, D: Deserializer<'de>>(d: D) -> Result<SecureString, D::Error> {
+    Deserialize::deserialize(d)
         .map_err(|e| format!("error while parsing field `code`: {e}"))
         .map_err(serde::de::Error::custom)
 }
 
 fn code_verifier<'de, D: Deserializer<'de>>(d: D) -> Result<CodeVerifier, D::Error> {
-    CodeVerifier::deserialize(d)
+    Deserialize::deserialize(d)
         .map_err(|e| format!("error while parsing field `code_verifier`: {e}"))
         .map_err(serde::de::Error::custom)
 }
 
 fn grant_type<'de, D: Deserializer<'de>>(d: D) -> Result<GrantType, D::Error> {
-    GrantType::deserialize(d)
+    Deserialize::deserialize(d)
         .map_err(|e| format!("error while parsing field `grant_type`: {e}"))
         .map_err(serde::de::Error::custom)
 }

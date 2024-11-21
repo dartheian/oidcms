@@ -1,9 +1,11 @@
 mod authorize;
 mod bounded_string;
 mod config;
-mod parameter;
+mod crypto;
+mod data;
 mod state;
 mod token;
+mod userinfo;
 
 use authorize::handler::authorize;
 use axum::http::StatusCode;
@@ -16,6 +18,7 @@ use token::handler::token;
 use tokio::net::TcpListener;
 use tokio::signal::ctrl_c;
 use tokio::signal::unix::{signal, SignalKind};
+use userinfo::userinfo;
 
 async fn shutdown_signal() {
     let ctrl_c = async {
@@ -35,13 +38,14 @@ async fn main() {
     let config = Configuration::new();
     let address: SocketAddr = (config.host, config.port).into();
     let state = AppState::from(config);
-    let app = Router::new()
-        .route("/health", get(|| async { StatusCode::OK }))
+    let router = Router::new()
         .route("/authorize", get(authorize))
+        .route("/health", get(|| async { StatusCode::OK }))
         .route("/token", post(token))
+        .route("/userinfo", get(userinfo))
         .with_state(state);
     let listener = TcpListener::bind(address).await.unwrap();
-    axum::serve(listener, app)
+    axum::serve(listener, router)
         .with_graceful_shutdown(shutdown_signal())
         .await
         .unwrap();

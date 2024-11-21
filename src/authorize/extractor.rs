@@ -1,5 +1,6 @@
-use crate::parameter::pkce::CodeChallenge;
-use crate::parameter::{ClientId, CodeChallengeMethod, ResponseMode, ResponseType, Scope, State};
+use crate::bounded_string::SecureString;
+use crate::data::pkce::CodeChallenge;
+use crate::data::{CodeChallengeMethod, ResponseMode, ResponseType, Scope};
 use axum::extract::{FromRequestParts, Query};
 use axum::http::Uri;
 use serde::{Deserialize, Deserializer};
@@ -12,9 +13,10 @@ use thiserror::Error;
 #[serde_as]
 #[derive(Clone, Deserialize, FromRequestParts)]
 #[from_request(via(Query))]
+#[allow(unused)]
 pub struct AuthorizeParams {
     #[serde(deserialize_with = "client_id")]
-    pub client_id: ClientId,
+    pub client_id: SecureString,
     #[serde(deserialize_with = "code_challenge_method")]
     pub code_challenge_method: CodeChallengeMethod,
     #[serde(deserialize_with = "code_challenge")]
@@ -28,10 +30,10 @@ pub struct AuthorizeParams {
     #[serde(deserialize_with = "scope")]
     pub scope: HashSet<Scope>,
     #[serde(deserialize_with = "state")]
-    pub state: State,
+    pub state: SecureString,
 }
 
-fn client_id<'de, D: Deserializer<'de>>(d: D) -> Result<ClientId, D::Error> {
+fn client_id<'de, D: Deserializer<'de>>(d: D) -> Result<SecureString, D::Error> {
     Deserialize::deserialize(d)
         .map_err(|e| format!("error while parsing field `client_id`: {e}"))
         .map_err(serde::de::Error::custom)
@@ -44,7 +46,7 @@ fn code_challenge_method<'de, D: Deserializer<'de>>(d: D) -> Result<CodeChalleng
 }
 
 fn code_challenge<'de, D: Deserializer<'de>>(d: D) -> Result<CodeChallenge, D::Error> {
-    CodeChallenge::deserialize(d)
+    Deserialize::deserialize(d)
         .map_err(|e| format!("error while parsing field `code_challenge`: {e}"))
         .map_err(serde::de::Error::custom)
 }
@@ -74,7 +76,7 @@ fn scope<'de, D: Deserializer<'de>>(d: D) -> Result<HashSet<Scope>, D::Error> {
         .map_err(serde::de::Error::custom)
 }
 
-fn state<'de, D: Deserializer<'de>>(d: D) -> Result<State, D::Error> {
+fn state<'de, D: Deserializer<'de>>(d: D) -> Result<SecureString, D::Error> {
     Deserialize::deserialize(d)
         .map_err(|e| format!("error while parsing field `state`: {e}"))
         .map_err(serde::de::Error::custom)

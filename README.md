@@ -21,29 +21,29 @@ Authentication and the Identity tokens are included in the responses.
 
 - The errors are unstructured human-readable strings, useful for debugging
   purposes
-- Use of a custom `groups` scope
 
 ## Okta implementation
 
+- [Tokens](https://developer.okta.com/docs/api/openapi/okta-oauth/guides/overview/)
 - [Authorization endpoint](https://developer.okta.com/docs/api/openapi/okta-oauth/oauth/tag/OrgAS/#tag/OrgAS/operation/authorize)
 - [Token endpoint](https://developer.okta.com/docs/api/openapi/okta-oauth/oauth/tag/OrgAS/#tag/OrgAS/operation/token)
+- [Userinfo endpoint](https://developer.okta.com/docs/api/openapi/okta-oauth/oauth/tag/OrgAS/#tag/OrgAS/operation/userinfo)
 
-### Okta differences from RFC
+### Extensions
 
-- The required Identity token `aud` field is renamed to `client_id` (the purpose
-  and content reamins unchanged)
+- Use of a custom `groups` scope
 
 ## Usage
 
 ```bash
-$ cargo run
-$ ./script/authenticate.sh
-$ ./script/token.sh <code value from previous response>
+cargo run
+./script/authenticate.sh
+./script/token.sh <code value from previous response>
+./script/userinfo.sh <access token value from previous response>
 ```
 
 ## TODO
 
-- Dockerfile
 - Document httpie usage in scripts
 - Implement error responses as per RFCs
 - Logs
