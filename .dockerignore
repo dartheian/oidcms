@@ -1,5 +1,6 @@
 .github
 .gitignore
+Dockerfile
 README.md
 script
 target

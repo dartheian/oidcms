@@ -1,12 +1,8 @@
-FROM rust:alpine AS build-env
+FROM rust:alpine
 WORKDIR /usr/src/oidcms
 COPY . .
 RUN apk add --no-cache musl-dev
-RUN cargo install --path . --root /usr
-
-FROM gcr.io/distroless/cc-debian12
-COPY --from=build-env /usr/bin/oidcms /
-CMD ["./oidcms"]
+RUN cargo install --path .
 
 ENV AUDIENCE="api.example.com"
 ENV CLIENT_SECRET="6W7XvLCrs4ByKn7Ucwh8ygeeXRhdGFdVOTp75eOc"
@@ -33,3 +29,6 @@ ENV USER__PHONE_NUMBER="+1 (425) 555-1212"
 ENV USER__PROFILE="https://example.com/john.doe"
 ENV USER__UPDATED_AT=946681200
 ENV USER__ZONEINFO="America/Los_Angeles"
+
+CMD ["oidcms"]
+HEALTHCHECK --interval=1m --timeout=2s --start-period=5s --start-interval=1s --retries=3 CMD wget --no-verbose --tries=1 --spider http://${HOST}:${PORT}/health
