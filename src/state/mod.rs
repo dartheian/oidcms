@@ -23,7 +23,9 @@ pub struct User {
     middle_name: NonEmptyString,
     name: NonEmptyString,
     nickname: NonEmptyString,
+    personio_email: NonEmptyString,
     phone_number: NonEmptyString,
+    preferred_username: NonEmptyString,
     updated_at: u64,
     zoneinfo: NonEmptyString,
 }
