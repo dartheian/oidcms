@@ -36,6 +36,9 @@ async fn shutdown_signal() {
 #[tokio::main]
 async fn main() {
     let config = Configuration::new();
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::TRACE)
+        .init();
     let address: SocketAddr = (config.host, config.port).into();
     let state = AppState::from(config);
     let router = Router::new()
