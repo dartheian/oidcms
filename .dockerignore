@@ -1,6 +1,7 @@
 .github
 .gitignore
+compose.yml
 Dockerfile
 README.md
-script
-target
+script/
+target/
