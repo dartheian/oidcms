@@ -3,7 +3,6 @@ use crate::{bounded_string::SecureString, data::Secret};
 use axum::http::Uri;
 use config::{Config, Environment};
 use serde::Deserialize;
-use std::net::Ipv4Addr;
 
 #[derive(Deserialize)]
 pub struct Configuration {
@@ -11,7 +10,6 @@ pub struct Configuration {
     pub audience: Uri,
     pub client_secret: SecureString,
     pub expiration: u64,
-    pub host: Ipv4Addr,
     #[serde(with = "http_serde::uri")]
     pub issuer: Uri,
     pub port: u16,

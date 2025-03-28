@@ -36,7 +36,7 @@ async fn shutdown_signal() {
 #[tokio::main]
 async fn main() {
     let config = Configuration::new();
-    let address: SocketAddr = (config.host, config.port).into();
+    let address: SocketAddr = ([0, 0, 0, 0], config.port).into();
     let state = AppState::from(config);
     let router = Router::new()
         .route("/authorize", get(authorize))

@@ -7,7 +7,6 @@ RUN cargo install --path .
 ENV AUDIENCE="api.example.com"
 ENV CLIENT_SECRET="6W7XvLCrs4ByKn7Ucwh8ygeeXRhdGFdVOTp75eOc"
 ENV EXPIRATION=60
-ENV HOST="0.0.0.0"
 ENV ISSUER="https://login.helloprima.com"
 ENV PORT=4000
 ENV RNG_SEED=0
