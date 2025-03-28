@@ -19,6 +19,7 @@ pub struct User {
     email: NonEmptyString,
     family_name: NonEmptyString,
     given_name: NonEmptyString,
+    groups: Vec<NonEmptyString>,
     locale: NonEmptyString,
     middle_name: NonEmptyString,
     name: NonEmptyString,

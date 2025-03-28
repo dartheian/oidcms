@@ -20,7 +20,11 @@ pub struct Configuration {
 
 impl Configuration {
     pub fn new() -> Self {
-        let env = Environment::default().separator("__");
+        let env = Environment::default()
+            .separator("__")
+            .list_separator(",")
+            .with_list_parse_key("user.groups")
+            .try_parsing(true);
         Config::builder()
             .add_source(env)
             .build()
